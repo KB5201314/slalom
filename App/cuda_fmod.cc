@@ -2,8 +2,10 @@
 #include "tensorflow/core/framework/shape_inference.h"
 #include "tensorflow/core/framework/op_kernel.h"
 
+#include "cuda_fmod.cu.cc"
+
 using namespace tensorflow;
-using GPUDevice = Eigen::GpuDevice;
+using CPUDevice = Eigen::ThreadPoolDevice;
 
 REGISTER_OP("ModCast")
 	.Attr("q: float")
@@ -51,7 +53,7 @@ class ModCastOp : public OpKernel {
     float p_;
 };
 
-REGISTER_KERNEL_BUILDER(Name("ModCast").Device(DEVICE_GPU), ModCastOp);
+REGISTER_KERNEL_BUILDER(Name("ModCast").Device(DEVICE_CPU), ModCastOp);
 
 
 REGISTER_OP("Fmod")
@@ -63,10 +65,6 @@ REGISTER_OP("Fmod")
       c->set_output(0, c->input(0));
       return Status::OK();
     });
-
-template <typename T> void FmodFunctor(int size, const T* in, const T p, T* out);
-template <> void FmodFunctor<float>(int size, const float* in, const float p, float* out);
-template <> void FmodFunctor<double>(int size, const double* in, const double p, double* out);
 
 template <typename T>
 class FmodOp : public OpKernel {
@@ -97,5 +95,5 @@ class FmodOp : public OpKernel {
     float p_;
 };
 
-REGISTER_KERNEL_BUILDER(Name("Fmod").Device(DEVICE_GPU).TypeConstraint<float>("T"), FmodOp<float>);
-REGISTER_KERNEL_BUILDER(Name("Fmod").Device(DEVICE_GPU).TypeConstraint<double>("T"), FmodOp<double>);
+REGISTER_KERNEL_BUILDER(Name("Fmod").Device(DEVICE_CPU).TypeConstraint<float>("T"), FmodOp<float>);
+REGISTER_KERNEL_BUILDER(Name("Fmod").Device(DEVICE_CPU).TypeConstraint<double>("T"), FmodOp<double>);
