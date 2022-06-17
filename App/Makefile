@@ -9,7 +9,7 @@ App_C_Flags := -O3 -fPIC $(App_Include_Paths) -march=native
 
 App_Cpp_Flags := $(App_C_Flags) -std=c++11 -shared
 App_Cpp_Flags_SGX := $(App_C_Flags) -std=c++11 -shared -DUSE_SGX
-App_Link_Flags := -L$(TF_LIB)
+App_Link_Flags := -L$(TF_LIB) -L$(shell realpath ./lib)
 #App_Link_Flags += -ltensorflow_framework -D_GLIBCXX_USE_CXX11_ABI=0
 App_Link_Flags += -ltensorflow_framework
 
