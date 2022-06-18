@@ -14,7 +14,7 @@
 #include <type_traits>
 #include <assert.h>
 #include <cmath>
-#include "immintrin.h"
+#include "simde/x86/avx.h"
 
 #ifndef USE_SGX
 #include "omp.h"

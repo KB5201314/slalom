@@ -6,7 +6,7 @@
 # pragma GCC target("aes")
 #endif
 
-#include <immintrin.h>
+#include "simde/x86/avx.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include "assert.h"

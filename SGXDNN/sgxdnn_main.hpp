@@ -1,7 +1,8 @@
 #ifndef SGXDNN_MAIN_H
 #define SGXDNN_MAIN_H
 
-#include <immintrin.h>
+#include "simde/x86/avx.h"
+#include "simde/x86/fma.h"
 #include <cmath>
 
 extern int p_int;

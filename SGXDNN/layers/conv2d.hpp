@@ -16,7 +16,7 @@
 #include "activation.hpp"
 #include "eigen_spatial_convolutions.h"
 #include <cmath>
-#include "immintrin.h"
+#include "simde/x86/avx.h"
 
 #ifndef USE_SGX
 #include <chrono>

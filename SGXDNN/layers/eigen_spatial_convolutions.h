@@ -797,6 +797,83 @@ struct gemm_pack_rhs<
   }
 };
 
+
+template <typename NewDimension, DenseIndex Rows, DenseIndex Cols,
+          typename ArgType, typename Device, typename Scalar, typename Index,
+          typename nocontract_t, typename contract_t,
+          bool inner_dim_contiguous, bool inner_dim_reordered, int Alignment,
+          int nr>
+struct gemm_pack_rhs<
+    Scalar, Index,
+    TensorContractionSubMapper<
+        Scalar, Index, Rhs,
+        TensorEvaluator<
+            const TensorReshapingOp<
+                NewDimension, const TensorImagePatchOp<Rows, Cols, ArgType> >,
+            Device>,
+        nocontract_t, contract_t, 2, inner_dim_contiguous,
+        inner_dim_reordered, Alignment>,
+    nr, ColMajor, false, false> {
+  typedef TensorContractionSubMapper<
+      Scalar, Index, Rhs,
+      TensorEvaluator<
+          const TensorReshapingOp<
+              NewDimension, const TensorImagePatchOp<Rows, Cols, ArgType> >,
+          Device>,
+      nocontract_t, contract_t, 2, inner_dim_contiguous,
+      inner_dim_reordered, Alignment>
+      SubMapper;
+  typedef SubMapper DataMapper;
+
+  EIGEN_DEVICE_FUNC
+  static inline Index ceil_div(Index a, Index b) { return (a + b - 1) / b; }
+
+  EIGEN_DEVICE_FUNC
+  EIGEN_DONT_INLINE void operator()(Scalar* block, const DataMapper& rhs,
+                                    Index depth, Index cols, Index stride = 0,
+                                    Index offset = 0) const {
+    eigen_assert(stride == 0);
+    eigen_assert(offset == 0);
+
+    EIGEN_STATIC_ASSERT((nr == 4), YOU_MADE_A_PROGRAMMING_MISTAKE);
+    const Index packet_cols4 = (cols / 4) * 4;
+
+    for (Index j2 = 0; j2 < packet_cols4; j2 += 4) {
+      const SubMapper dm0 = rhs.getLinearMapper(0, j2 + 0);
+      const SubMapper dm1 = rhs.getLinearMapper(0, j2 + 1);
+      const SubMapper dm2 = rhs.getLinearMapper(0, j2 + 2);
+      const SubMapper dm3 = rhs.getLinearMapper(0, j2 + 3);
+
+      if (!rhs.nonStandardPatches()) {
+        for (Index k = 0; k < depth; k++) {
+          block[0] = dm0.loadCoeffStandard(k);
+          block[1] = dm1.loadCoeffStandard(k);
+          block[2] = dm2.loadCoeffStandard(k);
+          block[3] = dm3.loadCoeffStandard(k);
+          block += 4;
+        }
+      } else {
+        for (Index k = 0; k < depth; k++) {
+          block[0] = dm0(k);
+          block[1] = dm1(k);
+          block[2] = dm2(k);
+          block[3] = dm3(k);
+          block += 4;
+        }
+      }
+    }
+
+    // copy the remaining columns one at a time (nr==1)
+    for (Index j2 = packet_cols4; j2 < cols; ++j2) {
+      const SubMapper dm0 = rhs.getLinearMapper(0, j2);
+      for (Index k = 0; k < depth; k++) {
+        *block = dm0(k);
+        block += 1;
+      }
+    }
+  }
+};
+
 // Special case for non-vectorized types such as float16.
 template <typename NewDimension, DenseIndex Rows, DenseIndex Cols,
           typename ArgType, typename Device, typename Scalar, typename Index,
