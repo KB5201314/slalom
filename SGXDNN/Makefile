@@ -1,17 +1,10 @@
 App_Cpp_Files := sgxdnn_main.cpp json11.cpp aes-stream.cpp
-App_Cpp_Files += sgxaes.cpp Crypto.cpp
+App_Cpp_Files += Crypto.cpp
 App_Cpp_Objects := $(App_Cpp_Files:%.cpp=bin/%.o)
-App_ASM_Files := sgxaes_asm.S
-App_ASM_Objects := $(App_ASM_Files:%.S=bin/%.o)
 
-App_Cpp_Include_Paths := -I../Include/eigen -I../Include/simde -I../Include -Icrypto
+App_Cpp_Include_Paths := -I../Include/eigen -I../Include/simde -I../Include/AArch64cryptolib -I../Include -Icrypto
 App_C_Flags := -fPIC $(App_Cpp_Include_Paths) -O3 -Wno-enum-compare -fopenmp -DSIMDE_ENABLE_NATIVE_ALIASES
-
-ifeq ($(CROSS_COMPILE), TRUE)
-	App_C_Flags += -march=armv8-a+simd
-else
-	App_C_Flags += -march=native
-endif
+App_C_Flags += -march=armv8-a+simd+crypto
 
 App_Cpp_Flags := -std=c++11 $(App_C_Flags)
 
@@ -37,12 +30,12 @@ bin/%.o: %.S
 	$(CXX) -fPIC -c $< -o $@
 	@echo "CC   <=  $<"
 
-$(Lib_Path)/sgxdnn.so: $(App_Cpp_Objects) $(App_ASM_Objects)
+$(Lib_Path)/sgxdnn.so: $(App_Cpp_Objects)
 	$(CXX) -fPIC -shared -o $@ $^ $(LDFLAGS) -pthread -fopenmp
 	@echo "LINK =>  $@"
 
 clean:
-	rm -rf $(Lib_Path)/sgxdnn.so $(App_Cpp_Objects) $(App_ASM_Objects)
+	rm -rf $(Lib_Path)/sgxdnn.so $(App_Cpp_Objects)
 
 
 $(DEPDIR)/%.d: ;

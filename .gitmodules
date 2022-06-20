@@ -1,3 +1,6 @@
 [submodule "Include/simde"]
 	path = Include/simde
 	url = https://github.com/simd-everywhere/simde.git
+[submodule "Include/AArch64cryptolib"]
+	path = Include/AArch64cryptolib
+	url = https://github.com/ARM-software/AArch64cryptolib.git

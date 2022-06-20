@@ -1,17 +1,13 @@
 #include "aes-stream.hpp"
 #include "sgxdnn_main.hpp"
 
-#if defined(__GNUC__) && !defined(__clang__)
-# pragma GCC target("ssse3")
-# pragma GCC target("aes")
-#endif
-
 #include "simde/x86/avx.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include "assert.h"
 #include <cstdio>
 #include <string>
+#include "aes-simde.h"
 
 #ifdef USE_SGX
 #include "Enclave.h"
