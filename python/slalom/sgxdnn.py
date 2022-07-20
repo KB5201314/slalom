@@ -13,7 +13,7 @@ from python.slalom.resnet import ResNetBlock
 import tensorflow as tf
 
 
-SGXDNNLIB = "App/enclave_bridge.so"
+SGXDNNLIB = "TA/host/optee_bridge.so"
 DNNLIB = "lib/sgxdnn.so"
 
 SGX_SLALOM_LIB = "lib/slalom_ops_sgx.so"
@@ -63,11 +63,11 @@ class SGXDNNUtils(object):
 
         print("loading model...")
         if verify:
-            load_method.argtypes = [c_char_p, POINTER(POINTER(ptr_type)), c_bool]
-            load_method(json.dumps(model_json).encode('utf-8'), filter_ptrs, verify_preproc)
+            load_method.argtypes = [c_char_p, POINTER(POINTER(ptr_type)), POINTER(c_size_t), c_size_t, c_bool]
+            load_method(json.dumps(model_json).encode('utf-8'), filter_ptrs, [len(w) for w in weights], len(filter_ptrs), verify_preproc)
         else:
-            load_method.argtypes = [c_char_p, POINTER(POINTER(ptr_type))]
-            load_method(json.dumps(model_json).encode('utf-8'), filter_ptrs)
+            load_method.argtypes = [c_char_p, POINTER(POINTER(ptr_type)), POINTER(c_size_t), c_size_t]
+            load_method(json.dumps(model_json).encode('utf-8'), filter_ptrs, [len(w) for w in weights], len(filter_ptrs))
         print("model loaded")
 
     def predict(self, x, num_classes=1000):

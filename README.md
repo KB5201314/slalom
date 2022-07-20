@@ -58,10 +58,10 @@ cd slalom/SGXDNN
 CC=../../../toolchains/aarch64/bin/aarch64-none-linux-gnu-gcc CXX=../../../toolchains/aarch64/bin/aarch64-none-linux-gnu-g++ CROSS_COMPILE=TRUE make
 ```
 
-6. Build the SGX application:
+6. Build the TA:
 ```
-cd slalom
-make
+cd TA
+CROSS_COMPILE=`realpath ../../../toolchains/aarch64/binaarch64-none-linux-gnu-` make -n
 ```
 
 ## Running Slalom

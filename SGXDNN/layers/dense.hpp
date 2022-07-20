@@ -52,25 +52,11 @@ namespace SGXDNN
 			assert(!verif_preproc);
 
 			use_sharding_ = false;
-			#ifdef USE_SGX
-			// shard if weight matrix is bigger than 8MB
-			if (h_in * h_out > 2 * 1000 * 1000) {
-				use_sharding_ = true;
-				mac = new MAC();
-
-				// TODO compute original MAC tags
-			}
-			#endif
-
-			if (use_sharding_) {
-				// keep the weights outside the enclave for now
-				kernel_data_ = kernel;
-			} else {
-				long kernel_size = h_in * h_out;
-				kernel_data_ = mem_pool_->alloc<T>(kernel_size);
-				std::copy(kernel, kernel + kernel_size, kernel_data_);
-				new (&kernel_) MatrixMap<T>(kernel_data_, h_in, h_out);
-			}
+			// force to copy kernel
+			long kernel_size = h_in * h_out;
+			kernel_data_ = mem_pool_->alloc<T>(kernel_size);
+			std::copy(kernel, kernel + kernel_size, kernel_data_);
+			new (&kernel_) MatrixMap<T>(kernel_data_, h_in, h_out);
 
 			long bias_size = h_out;
 			bias_data_ = mem_pool_->alloc<T>(bias_size);
