@@ -47,11 +47,17 @@ cd slalom/App
 make
 make -f Makefile_cu
 ```
-5. Build the SGXDNN library (for use without SGX):
+5. Build the SGXDNN library(lib/sgxdnn.so) (for use without SGX):
 ```
 cd slalom/SGXDNN
 make
 ```
+to cross compile it, use
+```sh
+cd slalom/SGXDNN
+CC=../../../toolchains/aarch64/bin/aarch64-none-linux-gnu-gcc CXX=../../../toolchains/aarch64/bin/aarch64-none-linux-gnu-g++ CROSS_COMPILE=TRUE make
+```
+
 6. Build the SGX application:
 ```
 cd slalom
