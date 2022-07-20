@@ -1,6 +1,5 @@
 
 import sys
-import tensorflow as tf
 
 
 def _preprocess_conv2d_input_fixed(x, data_format):
@@ -24,8 +23,10 @@ def _preprocess_conv2d_input_fixed(x, data_format):
 
 assert 'keras' not in sys.modules
 import keras
- 
+
 keras = sys.modules['keras']
 keras.backend.tensorflow_backend._preprocess_conv2d_input = _preprocess_conv2d_input_fixed
  
 sys.modules['keras'] = keras
+
+import tensorflow as tf
