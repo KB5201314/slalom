@@ -20,9 +20,7 @@ class ReluSlalomOp : public OpKernel {
  public:
   explicit ReluSlalomOp(OpKernelConstruction* context) : OpKernel(context) {
 #ifdef USE_SGX
-    OP_REQUIRES_OK(context, context->GetAttr("eid_low", &eid_low_));
-    OP_REQUIRES_OK(context, context->GetAttr("eid_high", &eid_high_));
-	lib_ = dlopen("App/enclave_bridge.so", RTLD_NOW);
+	lib_ = dlopen("TA/host/optee_bridge.so", RTLD_NOW);
 #else
 	lib_ = dlopen("lib/sgxdnn.so", RTLD_NOW);
 #endif
@@ -49,16 +47,13 @@ class ReluSlalomOp : public OpKernel {
     const Device& d = context->eigen_device<Device>();
 
 #ifdef USE_SGX
-    unsigned long int eid_ = (eid_high_ << 32) + eid_low_;
-
-	typedef void (*relu_ecall)(unsigned long int eid, float* in, float* out, float* blind, int num_elements, char* activation);
+	typedef void (*relu_ecall)(float* in, float* out, float* blind, int num_elements, char* activation);
 	dlerror();
 	relu_ecall relu = (relu_ecall) dlsym(lib_, "slalom_relu");
 	const char *dlsym_error = dlerror();
    	OP_REQUIRES(context, !dlsym_error, errors::Unknown("loading of relu failed: ", dlsym_error));	
 
-	relu(eid_,
-		 (float*) input.flat<T>().data(),
+	relu((float*) input.flat<T>().data(),
 		 (float*) output->flat<T>().data(),
 		 (float*) blind.flat<T>().data(),
 		 input.NumElements(),
@@ -85,10 +80,6 @@ class ReluSlalomOp : public OpKernel {
   void* lib_;
   std::string activation_;
 
-#ifdef USE_SGX
-  int64 eid_low_;
-  int64 eid_high_;
-#endif
 };
 
 typedef Eigen::ThreadPoolDevice CPUDevice;
@@ -96,10 +87,6 @@ typedef Eigen::ThreadPoolDevice CPUDevice;
 REGISTER_KERNEL_BUILDER(Name("ReluSlalom").Device(DEVICE_CPU), ReluSlalomOp<CPUDevice, float>);
 
 REGISTER_OP("ReluSlalom")
-#ifdef USE_SGX
-    .Attr("eid_low: int")
-    .Attr("eid_high: int")
-#endif
 	.Attr("activation: string")
     .Input("inp: float")
     .Input("blind: float")

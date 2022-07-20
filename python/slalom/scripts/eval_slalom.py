@@ -55,7 +55,8 @@ def main(_):
             threads = tf.train.start_queue_runners(sess=sess, coord=coord)
 
             #sgxutils = SGXDNNUtils(args.use_sgx, num_enclaves=batch_size)
-            sgxutils = SGXDNNUtils(args.use_sgx, num_enclaves=1)
+            # sgxutils = SGXDNNUtils(args.use_sgx, num_enclaves=1)
+            sgxutils = SGXDNNUtils(args.use_sgx)
 
             num_linear_layers = len(get_all_linear_layers(model))
             if blinded and not simulate:

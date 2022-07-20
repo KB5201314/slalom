@@ -136,7 +136,7 @@ def main(_):
                         #mod_test(sess, model, images, linear_ops_in, linear_ops_out, verif_preproc=args.preproc)
 
                         def func(data):
-                            return sgxutils.predict_and_verify(data[1], data[2], num_classes=num_classes, dtype=dtype, eid_idx=0)
+                            return sgxutils.predict_and_verify(data[1], data[2], num_classes=num_classes, dtype=dtype)
 
                         if not args.verify_batched:
                             start = timer()
@@ -164,7 +164,7 @@ def main(_):
                     else:
 
                         def func(data):
-                            return sgxutils.predict(data[1], num_classes=num_classes, eid_idx=0)
+                            return sgxutils.predict(data[1], num_classes=num_classes)
 
                         #all_data = [(i, images[i:i+1]) for i in range(args.batch_size)]
                         #preds = np.vstack(pool.map(func, all_data))

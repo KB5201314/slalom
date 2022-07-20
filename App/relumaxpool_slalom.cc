@@ -147,9 +147,7 @@ class ReluMaxPoolSlalomOp : public OpKernel {
                     "Pooling is not yet supported on the batch dimension."));
 
 #ifdef USE_SGX
-    OP_REQUIRES_OK(context, context->GetAttr("eid_low", &eid_low_));
-    OP_REQUIRES_OK(context, context->GetAttr("eid_high", &eid_high_));
-	lib_ = dlopen("App/enclave_bridge.so", RTLD_NOW);
+	lib_ = dlopen("TA/host/optee_bridge.so", RTLD_NOW);
 #else
 	lib_ = dlopen("lib/sgxdnn.so", RTLD_NOW);
 #endif
@@ -192,8 +190,7 @@ class ReluMaxPoolSlalomOp : public OpKernel {
     long int dim_out[4] = {dim_out_[0], dim_out_[1], dim_out_[2], dim_out_[3]};
 
 #ifdef USE_SGX
-    unsigned long int eid_ = (eid_high_ << 32) + eid_low_;
-	typedef void (*maxpoolrelu_ecall)(unsigned long int eid, float* in, float* out, float* blind, 
+	typedef void (*maxpoolrelu_ecall)(float* in, float* out, float* blind, 
 								  	  long int dim_in[4], long int dim_out[4], 
 								  	  int window_rows, int window_cols, int row_stride, int col_stride, bool same_padding);
     dlerror();
@@ -202,7 +199,7 @@ class ReluMaxPoolSlalomOp : public OpKernel {
     const char *dlsym_error = dlerror();
     OP_REQUIRES(context, !dlsym_error, errors::Unknown("loading of maxpoolrelu failed: ", dlsym_error));
 
-    mpr(eid_, (float*) input.flat<T>().data(), (float*) output->flat<T>().data(), (float*) blind.flat<T>().data(),
+    mpr((float*) input.flat<T>().data(), (float*) output->flat<T>().data(), (float*) blind.flat<T>().data(),
 	    dim_in, dim_out, params.window_rows, params.window_cols, params.row_stride, params.col_stride, (pt == Eigen::PaddingType::PADDING_SAME));
 
 #else
@@ -228,10 +225,6 @@ class ReluMaxPoolSlalomOp : public OpKernel {
   TensorFormat data_format_;
   void* lib_;
 
-#ifdef USE_SGX
-  int64 eid_low_;
-  int64 eid_high_;
-#endif
 };
 
 typedef Eigen::ThreadPoolDevice CPUDevice;
@@ -246,10 +239,6 @@ REGISTER_OP("ReluMaxPoolSlalom")
     .Attr("strides: list(int) >= 4")
     .Attr(GetPaddingAttrString())
     .Attr("data_format: {'NHWC', 'NCHW', 'NCHW_VECT_C'} = 'NHWC'")
-#ifdef USE_SGX
-    .Attr("eid_low: int")
-    .Attr("eid_high: int")
-#endif
     .Input("inp: float")
     .Input("blind: float")
     .Output("output: T")
