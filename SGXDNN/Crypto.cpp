@@ -50,13 +50,15 @@ void encrypt(uint8_t *plaintext, uint32_t plaintext_length, uint8_t *ciphertext,
     armv8_operation_result_t result =
         armv8_aes_gcm_set_counter((uint8_t *)iv_ptr, SGX_AESGCM_IV_SIZE, &cs);
     if (result != SUCCESSFUL_OPERATION) {
-        throw "Failure while setting nonce!\n";
+        printf("Failure while setting nonce!\n");
+        abort();
     }
     result =
         armv8_enc_aes_gcm_from_state(&cs, NULL, 0, plaintext, plaintext_length,
                                      ciphertext, (uint8_t *)mac_ptr);
     if (result != SUCCESSFUL_OPERATION) {
-        throw "Failure while encrypting!\n";
+        printf("Failure while encrypting!\n");
+        abort();
     }
 }
 
@@ -78,7 +80,8 @@ void decrypt(const uint8_t *ciphertext, uint32_t ciphertext_length,
     armv8_operation_result_t result =
         armv8_aes_gcm_set_counter((uint8_t *)iv_ptr, SGX_AESGCM_IV_SIZE, &cs);
     if (result != SUCCESSFUL_OPERATION) {
-        throw "Failure while setting nonce!\n";
+        printf("Failure while setting nonce!\n");
+        abort();
     }
     // imlk: just ignore `blind`, since it was not actually used by
     // intel_aes_gcmDEC in sgxaex_asm.S
@@ -88,7 +91,8 @@ void decrypt(const uint8_t *ciphertext, uint32_t ciphertext_length,
     if (result == AUTHENTICATION_FAILURE) {
         printf("Decrypt: invalid mac\n");
     } else if (result != SUCCESSFUL_OPERATION) {
-        throw "Failure while decrypting!\n";
+        printf("Failure while decrypting!\n");
+        abort();
     }
 }
 
@@ -99,7 +103,8 @@ MAC::MAC() {
     armv8_operation_result_t result =
         armv8_aes_gcm_set_counter((uint8_t *)iv, iv_len, &this->cs);
     if (result != SUCCESSFUL_OPERATION) {
-        throw "Failure while setting nonce!\n";
+        printf("Failure while setting nonce!\n");
+        abort();
     }
 }
 
