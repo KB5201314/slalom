@@ -5,5 +5,5 @@
 	path = Include/AArch64cryptolib
 	url = https://github.com/ARM-software/AArch64cryptolib.git
 [submodule "TA/third_party/binn"]
-	path = TA/third_party/binn
+	path = TA.old/third_party/binn
 	url = https://github.com/liteserver/binn.git
