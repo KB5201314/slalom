@@ -1,18 +1,21 @@
-export V?=0
+# Copyright (c) Open Enclave SDK contributors.
+# Licensed under the MIT License.
 
-# If _HOST or _TA specific compilers are not specified, then use CROSS_COMPILE
-HOST_CROSS_COMPILE ?= $(CROSS_COMPILE)
-TA_CROSS_COMPILE ?= $(CROSS_COMPILE)
+.PHONY: all build clean run simulate
 
-OPTEE_OUTBR_SYSROOT ?= $(shell realpath ../../../out-br/host/aarch64-buildroot-linux-gnu/sysroot/)
-TA_DEV_KIT_DIR ?= $(shell realpath ../../../optee_os/out/arm/export-ta_arm64/)
+OE_CRYPTO_LIB := mbedtls
+export OE_CRYPTO_LIB
 
-.PHONY: all
-all:
-	$(MAKE) -C host CROSS_COMPILE="$(HOST_CROSS_COMPILE)" OPTEE_OUTBR_SYSROOT="$(OPTEE_OUTBR_SYSROOT)" --no-builtin-variables
-	$(MAKE) -C ta CROSS_COMPILE="$(TA_CROSS_COMPILE)" TA_DEV_KIT_DIR="$(TA_DEV_KIT_DIR)" LDFLAGS=""
+all: build
 
-.PHONY: clean
+build:
+	$(MAKE) -C enclave
+	$(MAKE) -C host
+
 clean:
-	$(MAKE) -C host clean OPTEE_OUTBR_SYSROOT="$(OPTEE_OUTBR_SYSROOT)"
-	$(MAKE) -C ta clean TA_DEV_KIT_DIR="$(TA_DEV_KIT_DIR)"
+	$(MAKE) -C enclave clean
+	$(MAKE) -C host clean
+
+run:
+	host/helloworldhost ./enclave/helloworldenc.signed
+

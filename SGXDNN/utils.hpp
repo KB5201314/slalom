@@ -5,7 +5,7 @@
 #include "tensor_types.h"
 
 #ifdef USE_SGX
-#include "Enclave_t.h"
+#include "sgxdnn_optee_t.h"
 #else
 #include <chrono>
 #endif

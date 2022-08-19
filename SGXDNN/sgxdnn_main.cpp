@@ -6,7 +6,7 @@
 #define EIGEN_USE_THREADS
 #else
 #include "Enclave.h"
-#include "sgx_trts.h"
+// #include "sgx_trts.h"
 #endif
 
 #include "sgxdnn_main.hpp"
@@ -194,7 +194,7 @@ extern "C" {
 
 			#ifdef USE_SGX
 			size_t aux_size = batch_size * model_float.layers[i]->output_size();
-			assert(sgx_is_outside_enclave(aux_data[linear_idx], aux_size * sizeof(float)));
+			assert(oe_is_outside_enclave(aux_data[linear_idx], aux_size * sizeof(float)));
 			#endif
 
 			sgx_time_t layer_start = get_time();

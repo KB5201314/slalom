@@ -723,7 +723,9 @@ void benchmark(int n_threads) {
 	Eigen::ThreadPoolDevice device(&pool, n_threads);
 	Eigen::setNbThreads(n_threads);
 	void* device_ptr = (void*) &device;
+	#ifndef USE_SGX
 	omp_set_num_threads(n_threads);
+	#endif
 #else
 	assert(n_threads == 1);
 

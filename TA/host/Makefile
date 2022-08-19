@@ -1,36 +1,20 @@
-CC      ?= $(CROSS_COMPILE)gcc
-LD      ?= $(CROSS_COMPILE)ld
-AR      ?= $(CROSS_COMPILE)ar
-NM      ?= $(CROSS_COMPILE)nm
-OBJCOPY ?= $(CROSS_COMPILE)objcopy
-OBJDUMP ?= $(CROSS_COMPILE)objdump
-READELF ?= $(CROSS_COMPILE)readelf
+# Copyright (c) Open Enclave SDK contributors.
+# Licensed under the MIT License.
 
-OBJS = optee_bridge.o
+include ../config.mk
 
-CFLAGS += -shared -Wall --sysroot=$(OPTEE_OUTBR_SYSROOT) -I../ta/include -I./include -L$(OPTEE_OUTBR_SYSROOT)/include -L$(OPTEE_OUTBR_SYSROOT)/usr/include
+CFLAGS=$(shell pkg-config oeenclave-$(COMPILER) --cflags | sed s/-m64/-march=armv8-a+simd+crypto/g)
+LDFLAGS=$(shell pkg-config oehost-$(COMPILER) --libs)
+INCDIR=$(shell pkg-config oehost-$(COMPILER) --variable=includedir)
 
-CFLAGS += -I../third_party/binn/src
+build:
+	@ echo "Compilers used: $(CC), $(CXX)"
+	oeedger8r ../sgxdnn_wrap.edl --untrusted \
+		--search-path $(INCDIR) \
+		--search-path $(INCDIR)/openenclave/edl/sgx
+	$(CC) -g -c $(CFLAGS) host.c
+	$(CC) -g -c $(CFLAGS) sgxdnn_wrap_u.c
+	$(CC) -o sgxdnn_optee_bridge sgxdnn_wrap_u.o host.o $(LDFLAGS)
 
-#Add/link other required libraries here
-LDADD += -lteec --sysroot=$(OPTEE_OUTBR_SYSROOT) -L$(OPTEE_OUTBR_SYSROOT)/lib -L$(OPTEE_OUTBR_SYSROOT)/usr/lib
-
-BINARY = optee_bridge.so
-
-.PHONY: all
-all: $(BINARY)
-
-.PHONY: ../third_party/binn/libbinn.a
-../third_party/binn/libbinn.a:
-	make -C ../third_party/binn static CROSS_PREFIX=$(CROSS_COMPILE)
-
-$(BINARY): $(OBJS) ../third_party/binn/libbinn.a
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDADD)
-
-.PHONY: clean
 clean:
-	rm -f $(OBJS) $(BINARY)
-	make -C ../third_party/binn clean CROSS_PREFIX=$(CROSS_COMPILE)
-
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	rm -f sgxdnn_optee_bridge host.o sgxdnn_wrap_u.o sgxdnn_wrap_u.c sgxdnn_wrap_u.h sgxdnn_wrap_args.h

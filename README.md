@@ -59,10 +59,35 @@ CC=../../../toolchains/aarch64/bin/aarch64-none-linux-gnu-gcc CXX=../../../toolc
 ```
 
 6. Build the TA:
-```
+
+cmake方法
+```sh
+export DEV_KIT=/optee/openenclave_qemu/emulation/optee_os/out/arm/
+export OE_SDK_SOURCE=/optee/openenclave_qemu/sdk
+
 cd TA
-CROSS_COMPILE=`realpath ../../../toolchains/aarch64/binaarch64-none-linux-gnu-` make -n
+mkdir build
+cd build
+
+. /opt/openenclave/share/openenclave/openenclaverc
+
+cmake ../ \
+    -G Ninja \
+    -DCMAKE_TOOLCHAIN_FILE=$OE_SDK_SOURCE/cmake/arm-cross.cmake \
+    -DOE_TA_DEV_KIT_DIR=$DEV_KIT/export-ta_arm64 \
+    -DCMAKE_BUILD_TYPE=Debug
+
+ninja
+
 ```
+makefile方法（废弃）
+```sh
+. /opt/openenclave/share/openenclave/openenclaverc
+
+CC=/optee/openenclave_qemu/emulation/toolchains/aarch64/bin/aarch64-linux-gnu-gcc CXX=/optee/openenclave_qemu/emulation/toolchains/aarch64/bin/aarch64-linux-gnu-g++ make build
+
+```
+
 
 ## Running Slalom
 

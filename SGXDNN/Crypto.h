@@ -2,8 +2,10 @@
 // #include "sgxaes.h"
 
 #define restrict __restrict__
-#include "AArch64cryptolib.h"
 
+extern "C" {
+#include "AArch64cryptolib.h"
+}
 #ifndef CRYPTO_H
 #define CRYPTO_H
 

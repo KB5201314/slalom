@@ -2,7 +2,8 @@
 
 #ifdef USE_SGX
 #include "Enclave.h"
-#include <sgx_trts.h>
+// #include <sgx_trts.h>
+#include <openenclave/enclave.h>
 #else
 
 #include <stdio.h>
@@ -43,7 +44,7 @@ void encrypt(uint8_t *plaintext, uint32_t plaintext_length, uint8_t *ciphertext,
     // MAC size is 16 bytes/128 bits
 
     // generate random IV
-    sgx_read_rand((uint8_t *)iv_ptr, SGX_AESGCM_IV_SIZE);
+    oe_random((uint8_t *)iv_ptr, SGX_AESGCM_IV_SIZE);
 
     armv8_cipher_state_t cs;
     cs.constants = &cc;

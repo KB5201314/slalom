@@ -1,11 +1,1 @@
-*.dmp
-*.elf
-*.map
-*.ta
-*.so
-*.strip
-dyn_list
-*.o
-*.a
-ta.lds
-*.cmd
+build

@@ -17,7 +17,7 @@
 #include <chrono>
 #else
 #include "Enclave.h"
-#include "sgx_tcrypto.h"
+#include <openenclave/enclave.h>
 #include "Crypto.h"
 #endif
 
