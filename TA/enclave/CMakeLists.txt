@@ -22,7 +22,7 @@ add_enclave_optee(
   TARGET
   sgxdnn_optee
   UUID
-  0a6cbbd3-160a-4c86-9d9d-c9cf1956be16
+  cf215436-3453-4888-bcc2-59dc1bb8b5b7
   SOURCES
   ../../SGXDNN/sgxdnn_main.cpp
   ../../SGXDNN/json11.cpp

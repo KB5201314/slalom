@@ -19,14 +19,13 @@
 #define FALSE 0
 #endif
 
-#define TOKEN_FILENAME "enclave.token"
-#define ENCLAVE_FILENAME "enclave.signed.so"
+#define ENCLAVE_FILENAME "cf215436-3453-4888-bcc2-59dc1bb8b5b7.ta"
 
 using namespace std::chrono;
 
 /* Check error conditions for loading enclave */
 void print_error_message(oe_result_t result) {
-    printf("Error: %s\n", oe_result_str(result));
+    printf("print_error_message() -> Error: %s\n", oe_result_str(result));
 }
 
 /* OCall functions */

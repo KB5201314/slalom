@@ -57,10 +57,10 @@ void ecall_sgxdnn_benchmarks(int num_threads) {
 
 
 #define TA_UUID                                            \
-    { /* 4d5d6469-e571-4619-aefe-cc28d839f367 */           \
-        0x4d5d6469, 0xe571, 0x4619,                        \
+    { /* cf215436-3453-4888-bcc2-59dc1bb8b5b7 */           \
+        0xcf215436, 0x3453, 0x4888,                        \
         {                                                  \
-            0xae, 0xfe, 0xcc, 0x28, 0xd8, 0x39, 0xf3, 0x67 \
+            0xbc, 0xc2, 0x59, 0xdc, 0x1b, 0xb8, 0xb5, 0xb7 \
         }                                                  \
     }
 

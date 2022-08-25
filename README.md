@@ -66,7 +66,7 @@ export DEV_KIT=/optee/openenclave_qemu/emulation/optee_os/out/arm/
 export OE_SDK_SOURCE=/optee/openenclave_qemu/sdk
 
 cd TA
-mkdir build
+mkdir -p build
 cd build
 
 . /opt/openenclave/share/openenclave/openenclaverc
