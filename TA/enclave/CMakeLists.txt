@@ -66,6 +66,9 @@ enclave_include_directories(sgxdnn_optee PRIVATE
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_FLAGS} -I/opt/openenclave/include/openenclave/3rdparty/libc")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -D_GLIBCXX_USE_CXX11_ABI=0 -std=c++11 -Os -fdata-sections -ffunction-sections -Wl,--gc-sections -fno-exceptions -I/opt/openenclave/include/openenclave/3rdparty/libcxx")
 
+# make OS/ABI field of generated elf file to SYS V
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-gnu-unique")
+
 enclave_include_directories(sgxdnn_optee PRIVATE
   ${CMAKE_CURRENT_SOURCE_DIR}/../../SGXDNN)
 
